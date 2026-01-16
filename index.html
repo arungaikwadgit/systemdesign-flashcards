@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>System Design Flashcards</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.webmanifest" />
+</head>
+<body>
+<header>
+  <h1>System Design Flashcards</h1>
+  <p class="hint">Tap the card to flip</p>
+</header>
+<main>
+  <div class="controls">
+    <select id="difficultyFilter">
+      <option value="All">All</option>
+      <option value="Basic">Basic</option>
+      <option value="Intermediate">Intermediate</option>
+      <option value="Advanced">Advanced</option>
+    </select>
+    <button id="shuffleBtn">Shuffle</button>
+  </div>
+  <div class="card-container">
+    <div id="card" class="card">
+      <div class="card-face card-front"><div id="question"></div></div>
+      <div class="card-face card-back"><div id="answer"></div></div>
+    </div>
+  </div>
+  <div class="actions">
+    <button data-score="got">Got It</button>
+    <button data-score="partial">Partial</button>
+    <button data-score="missed">Missed</button>
+  </div>
+  <div id="summary" class="summary hidden"></div>
+</main>
+<script src="script.js"></script>
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
+}
+</script>
+</body>
+</html>
