@@ -277,6 +277,17 @@ input:checked + .slider:before {
   flex-direction: column;
 }
 
+/* Allow content to scroll inside the card face (so long answers are not cut) */
+.flip-face{
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Give the answer side a bit more vertical space behavior */
+.flip-back .answer{
+  padding-bottom: 24px;
+}
+
 .flip-front{
   background: var(--panel);
   color: var(--text);

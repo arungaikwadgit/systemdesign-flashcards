@@ -90,22 +90,44 @@
     setFlipped(isNowFlipped);
   }
 
-  function showAnswer() {
+    function showAnswer() {
     setFlipped(true);
-  }
+    // scroll answer side to top
+    const backFace = document.querySelector(".flip-back");
+    if (backFace) backFace.scrollTop = 0;
+    }
+
 
   // Android/Chrome reliability: use pointer events instead of inline onclick
-  if (cardEl) {
+  let moved = false;
+
+    if (cardEl) {
+    cardEl.addEventListener("pointerdown", () => {
+        moved = false;
+    });
+
+    cardEl.addEventListener("pointermove", () => {
+        moved = true; // user is scrolling/swiping
+    });
+
     cardEl.addEventListener("pointerup", (e) => {
-      const target = e.target;
-      if (
+        const target = e.target;
+
+        // If user was scrolling, do not flip
+        if (moved) return;
+
+        // Don't flip if tapping controls
+        if (
         target &&
         (target.closest("button") || target.closest("select") || target.closest("input") || target.closest("label"))
-      ) {
+        ) {
         return;
-      }
-      flipCard();
+        }
+
+        flipCard();
     });
+    }
+
   }
 
   // Stop bubbling so taps on controls never flip card
@@ -182,6 +204,9 @@
   }
 
   function loadCard() {
+    const backFace = document.querySelector(".flip-back");
+    if (backFace) backFace.scrollTop = 0;
+
     if (index >= deck.length) {
       showResult();
       return;
