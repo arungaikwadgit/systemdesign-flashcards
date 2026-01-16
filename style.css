@@ -208,7 +208,7 @@ input:checked + .slider:before {
 }
 
 /* =======================
-   FLIP CARD IMPLEMENTATION (Android-safe)
+   FLIP CARD (Android-safe)
    ======================= */
 
 .card{
@@ -224,7 +224,6 @@ input:checked + .slider:before {
   overflow: hidden;
   padding: 0;
 
-  /* Important for mobile tap */
   touch-action: manipulation;
   user-select: none;
 }
@@ -237,15 +236,14 @@ input:checked + .slider:before {
   color: var(--muted);
   opacity: 0.9;
   z-index: 5;
-  pointer-events: none; /* don’t block taps */
+  pointer-events: none;
 }
 
-/* Flip container */
 .flip{
   width: 100%;
   height: 100%;
   perspective: 1200px;
-  -webkit-perspective: 1200px; /* Android */
+  -webkit-perspective: 1200px;
 }
 
 .flip-inner{
@@ -254,7 +252,7 @@ input:checked + .slider:before {
   position: relative;
 
   transform-style: preserve-3d;
-  -webkit-transform-style: preserve-3d; /* Android */
+  -webkit-transform-style: preserve-3d;
 
   transition: transform 420ms ease;
   -webkit-transition: -webkit-transform 420ms ease;
@@ -264,17 +262,16 @@ input:checked + .slider:before {
 
 .flip-inner.is-flipped{
   transform: rotateY(180deg);
-  -webkit-transform: rotateY(180deg); /* Android */
+  -webkit-transform: rotateY(180deg);
 }
 
-/* Faces */
 .flip-face{
   position: absolute;
   inset: 0;
   padding: 18px;
 
   backface-visibility: hidden;
-  -webkit-backface-visibility: hidden; /* Android */
+  -webkit-backface-visibility: hidden;
 
   display: flex;
   flex-direction: column;
@@ -288,18 +285,8 @@ input:checked + .slider:before {
 .flip-back{
   background: var(--panel);
   color: var(--text);
-
   transform: rotateY(180deg);
-  -webkit-transform: rotateY(180deg); /* Android */
-}
-
-/* Bigger answer */
-.answer{
-  margin-top: 12px;
-  font-size: 20px;  /* increased */
-  line-height: 1.45;
-  color:#111827;
-  font-weight: 650;
+  -webkit-transform: rotateY(180deg);
 }
 
 /* Difficulty badge */
@@ -337,12 +324,14 @@ input:checked + .slider:before {
   line-height: 1.25;
 }
 
+/* Bigger answer font (your request) */
 .answer{
   margin-top: 12px;
-  font-size: 18px; /* bigger answer text */
+  font-size: 20px;
   line-height: 1.45;
   color:#111827;
-  font-weight: 600;
+  font-weight: 650;
+  white-space: pre-line;
 }
 
 /* Hints on faces */
@@ -354,7 +343,7 @@ input:checked + .slider:before {
   padding-top: 8px;
 }
 
-/* Small screens: stack buttons */
+/* Small screens */
 @media (max-width: 420px){
   .buttons{
     flex-direction: column;
@@ -363,6 +352,6 @@ input:checked + .slider:before {
     width: 100%;
   }
   .answer{
-    font-size: 19px;
+    font-size: 21px;
   }
 }

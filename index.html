@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+   <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 
-  <title>GenAI Flashcards</title>
+  <title>System Design Flashcards</title>
   <link rel="stylesheet" href="style.css" />
 
   <!-- PWA -->
@@ -20,9 +20,9 @@
     <header class="header">
       <div>
         <h1>System Design Flashcards</h1>
-        <div class="sub">Interview drill mode (20 cards)</div>
+        <div class="sub">20 concepts • tap to flip • interview-ready</div>
       </div>
-      <button class="secondary" id="restartTopBtn" onclick="restartGame()">Restart</button>
+      <button class="secondary" id="restartTopBtn">Restart</button>
     </header>
 
     <section class="controls">
@@ -66,7 +66,7 @@
     <main class="main">
 
       <!-- FLIP CARD -->
-      <div class="card" id="card">
+      <div class="card" id="card" role="button" aria-label="Flashcard (tap to flip)">
         <div class="tap-hint">Tap to flip</div>
 
         <div class="flip">
@@ -91,13 +91,13 @@
       </div>
 
       <div class="actions">
-        <button class="primary" onclick="showAnswer()">Show Answer</button>
+        <button class="primary" id="showAnswerBtn">Show Answer</button>
       </div>
 
       <div class="buttons">
-        <button class="good" onclick="markAnswer('good')">✅ Got it</button>
-        <button class="ok" onclick="markAnswer('ok')">⚠️ Partial</button>
-        <button class="bad" onclick="markAnswer('bad')">❌ Missed</button>
+        <button class="good" id="goodBtn">✅ Got it</button>
+        <button class="ok" id="okBtn">⚠️ Partial</button>
+        <button class="bad" id="badBtn">❌ Missed</button>
       </div>
 
       <div id="result" class="result hidden"></div>
@@ -105,14 +105,18 @@
     </main>
 
     <footer class="footer">
-      Tip: Answer in <b>30–45 seconds</b>, then add <b>one example</b>.
+      Tip: Answer in <b>30–45 seconds</b>, then add <b>one trade-off</b>.
       <button class="install-btn hidden" id="installBtn">Install App</button>
     </footer>
 
   </div>
 
+  <!-- Data first -->
+  <script src="data/system-design-cards.js"></script>
+  <!-- App logic -->
   <script src="script.js"></script>
 
+  <!-- PWA install logic -->
   <script>
     // Service Worker (required for install + offline)
     if ("serviceWorker" in navigator) {
@@ -158,11 +162,11 @@
           alert(
             "Install prompt is not available yet.\n\n" +
             "Common causes:\n" +
-            "1) You opened the app using file:// (must use http://localhost)\n" +
+            "1) You opened the app using file:// (must use https:// or http://)\n" +
             "2) Manifest or service worker not loading\n" +
             "3) Icons missing / wrong path\n" +
             "4) App already installed\n\n" +
-            "Fix: run with Live Server or http-server and refresh."
+            "Fix: host on GitHub Pages (https) and refresh."
           );
           return;
         }
@@ -192,4 +196,3 @@
   </script>
 </body>
 </html>
-

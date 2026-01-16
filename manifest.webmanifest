@@ -7,7 +7,7 @@
   "background_color": "#0b1f33",
   "theme_color": "#0b1f33",
   "orientation": "portrait",
-  "description": "GenAI interview flashcards with difficulty filters, timer, shuffle, and review missed.",
+  "description": "System design flashcards with difficulty filters, timer, shuffle, and review missed.",
   "icons": [
     {
       "src": "icons/icon-192.png",
