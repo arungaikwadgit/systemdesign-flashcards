@@ -2,44 +2,193 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>System Design Flashcards</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+
+  <title>GenAI Flashcards</title>
   <link rel="stylesheet" href="style.css" />
+
+  <!-- PWA -->
   <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#0b1f33" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 </head>
+
 <body>
-<header>
-  <h1>System Design Flashcards</h1>
-  <p class="hint">Tap the card to flip</p>
-</header>
-<main>
-  <div class="controls">
-    <select id="difficultyFilter">
-      <option value="All">All</option>
-      <option value="Basic">Basic</option>
-      <option value="Intermediate">Intermediate</option>
-      <option value="Advanced">Advanced</option>
-    </select>
-    <button id="shuffleBtn">Shuffle</button>
-  </div>
-  <div class="card-container">
-    <div id="card" class="card">
-      <div class="card-face card-front"><div id="question"></div></div>
-      <div class="card-face card-back"><div id="answer"></div></div>
+  <div class="app">
+
+    <header class="header">
+      <div>
+        <h1>GenAI Flashcards</h1>
+        <div class="sub">Interview drill mode (50 cards)</div>
+      </div>
+      <button class="secondary" id="restartTopBtn" onclick="restartGame()">Restart</button>
+    </header>
+
+    <section class="controls">
+      <div class="control">
+        <label class="switch">
+          <input type="checkbox" id="shuffleToggle" checked />
+          <span class="slider"></span>
+        </label>
+        <span class="control-text">Shuffle</span>
+      </div>
+
+      <div class="control">
+        <label class="switch">
+          <input type="checkbox" id="timerToggle" />
+          <span class="slider"></span>
+        </label>
+        <span class="control-text">Timer</span>
+      </div>
+
+      <div class="control timer-settings">
+        <span class="control-text">Seconds</span>
+        <input type="number" id="timerSeconds" min="10" max="180" value="45" />
+      </div>
+
+      <div class="control">
+        <span class="control-text">Difficulty</span>
+        <select id="difficultyFilter">
+          <option value="all" selected>All</option>
+          <option value="Basic">Basic</option>
+          <option value="Intermediate">Intermediate</option>
+          <option value="Advanced">Advanced</option>
+        </select>
+      </div>
+    </section>
+
+    <div class="meta">
+      <div id="progress" class="progress"></div>
+      <div id="timer" class="timer hidden"></div>
     </div>
+
+    <main class="main">
+
+      <!-- FLIP CARD -->
+      <div class="card" id="card">
+        <div class="tap-hint">Tap to flip</div>
+
+        <div class="flip">
+          <div class="flip-inner" id="flipInner">
+
+            <!-- FRONT -->
+            <div class="flip-face flip-front">
+              <div class="badge" id="difficultyBadge"></div>
+              <div class="question" id="question"></div>
+              <div class="front-hint">Question</div>
+            </div>
+
+            <!-- BACK -->
+            <div class="flip-face flip-back">
+              <div class="badge" id="difficultyBadgeBack"></div>
+              <div class="answer" id="answer"></div>
+              <div class="back-hint">Answer</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="primary" onclick="showAnswer()">Show Answer</button>
+      </div>
+
+      <div class="buttons">
+        <button class="good" onclick="markAnswer('good')">✅ Got it</button>
+        <button class="ok" onclick="markAnswer('ok')">⚠️ Partial</button>
+        <button class="bad" onclick="markAnswer('bad')">❌ Missed</button>
+      </div>
+
+      <div id="result" class="result hidden"></div>
+
+    </main>
+
+    <footer class="footer">
+      Tip: Answer in <b>30–45 seconds</b>, then add <b>one example</b>.
+      <button class="install-btn hidden" id="installBtn">Install App</button>
+    </footer>
+
   </div>
-  <div class="actions">
-    <button data-score="got">Got It</button>
-    <button data-score="partial">Partial</button>
-    <button data-score="missed">Missed</button>
-  </div>
-  <div id="summary" class="summary hidden"></div>
-</main>
-<script src="script.js"></script>
-<script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js");
-}
-</script>
+
+  <script src="script.js"></script>
+
+  <script>
+    // Service Worker (required for install + offline)
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js").catch(console.error);
+    }
+
+    // Android install prompt handling
+    let deferredPrompt = null;
+    const installBtn = document.getElementById("installBtn");
+
+    function setInstallButton(state, text) {
+      if (!installBtn) return;
+      if (state === "hide") {
+        installBtn.classList.add("hidden");
+        installBtn.disabled = true;
+        installBtn.textContent = "Install App";
+        return;
+      }
+      installBtn.classList.remove("hidden");
+      installBtn.disabled = state === "disabled";
+      if (text) installBtn.textContent = text;
+    }
+
+    const isStandalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.navigator.standalone;
+
+    if (isStandalone) {
+      setInstallButton("hide");
+    } else {
+      setInstallButton("disabled", "Install not ready yet");
+    }
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      setInstallButton("enabled", "Install App");
+    });
+
+    if (installBtn) {
+      installBtn.addEventListener("click", async () => {
+        if (!deferredPrompt) {
+          alert(
+            "Install prompt is not available yet.\n\n" +
+            "Common causes:\n" +
+            "1) You opened the app using file:// (must use http://localhost)\n" +
+            "2) Manifest or service worker not loading\n" +
+            "3) Icons missing / wrong path\n" +
+            "4) App already installed\n\n" +
+            "Fix: run with Live Server or http-server and refresh."
+          );
+          return;
+        }
+
+        setInstallButton("disabled", "Installing…");
+        deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        deferredPrompt = null;
+
+        if (choice && choice.outcome === "accepted") {
+          setInstallButton("hide");
+        } else {
+          setInstallButton("enabled", "Install App");
+        }
+      });
+    }
+
+    window.addEventListener("appinstalled", () => {
+      setInstallButton("hide");
+    });
+
+    setTimeout(() => {
+      if (!deferredPrompt && !isStandalone) {
+        setInstallButton("disabled", "Install unavailable");
+      }
+    }, 2500);
+  </script>
 </body>
 </html>

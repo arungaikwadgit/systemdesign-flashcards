@@ -1,12 +1,368 @@
-body{margin:0;background:#0f172a;color:#f8fafc;font-family:system-ui;text-align:center}
-header{padding:16px}
-.controls{display:flex;justify-content:center;gap:10px}
-button,select{padding:10px;border-radius:8px;border:none}
-button{background:#2563eb;color:white}
-.card-container{perspective:1000px;display:flex;justify-content:center;margin:20px}
-.card{width:90%;max-width:420px;height:260px;position:relative;transition:transform .6s;transform-style:preserve-3d;-webkit-transform-style:preserve-3d}
-.card.flipped{transform:rotateY(180deg)}
-.card-face{position:absolute;width:100%;height:100%;padding:20px;border-radius:12px;background:#1e293b;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;align-items:center;justify-content:center}
-.card-front{font-size:1.4rem}
-.card-back{transform:rotateY(180deg);font-size:1.1rem}
-.hidden{display:none}
+:root{
+  --bg:#0b1f33;
+  --panel:#f7f9fc;
+  --text:#0c1220;
+  --muted:#6b7280;
+  --accent:#1f7a7a;
+  --border:#c9ced6;
+}
+
+/* Reset */
+*{ box-sizing:border-box; }
+html, body { height: 100%; }
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color:#fff;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* App layout: fill screen like a native app */
+.app{
+  min-height: 100dvh;
+  padding:
+    calc(14px + env(safe-area-inset-top))
+    14px
+    calc(14px + env(safe-area-inset-bottom));
+  max-width: 520px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+
+h1{ margin:0; font-size: 22px; }
+.sub{ margin-top:4px; font-size: 12px; opacity: 0.85; }
+
+/* Controls */
+.controls{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  align-items:center;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+}
+
+.control{ display:flex; align-items:center; gap:8px; }
+.control-text{ font-size: 13px; opacity:0.92; }
+
+.controls select,
+.timer-settings input{
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06);
+  color:#fff;
+  outline: none;
+  font-size: 14px;
+}
+
+.controls option{ color:#111; }
+
+/* Meta bar */
+.meta{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+.progress{ font-size: 13px; opacity:0.9; }
+.timer{
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06);
+}
+.hidden{ display:none; }
+
+/* Main content expands */
+.main{
+  display:flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+/* Buttons */
+button{
+  border:none;
+  cursor:pointer;
+  user-select:none;
+  touch-action: manipulation;
+}
+
+.primary{
+  background: var(--accent);
+  color:#fff;
+  width: 100%;
+  padding: 14px 12px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.secondary{
+  background: rgba(255,255,255,0.08);
+  color:#fff;
+  border: 1px solid rgba(255,255,255,0.18);
+  padding: 11px 12px;
+  border-radius: 12px;
+}
+
+.actions{
+  display:flex;
+  justify-content:center;
+}
+
+.buttons{
+  display:flex;
+  gap:10px;
+}
+.buttons button{
+  flex:1;
+  padding: 14px 12px;
+  font-size: 14px;
+  border-radius: 14px;
+}
+
+.good{ background:#2e8b57; color:#fff; }
+.ok{ background:#f0ad4e; color:#111; }
+.bad{ background:#d9534f; color:#fff; }
+
+/* Result panel */
+.result{
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 14px;
+  padding: 14px;
+  line-height: 1.5;
+}
+.result h2{ margin:0 0 8px 0; font-size: 18px; }
+.result .row{
+  display:flex;
+  justify-content:space-between;
+  padding: 8px 0;
+  border-bottom: 1px dashed rgba(255,255,255,0.16);
+}
+.result .row:last-child{ border-bottom:none; }
+
+/* Footer */
+.footer{
+  font-size: 12px;
+  opacity: 0.88;
+  line-height: 1.35;
+}
+.install-btn{
+  margin-top: 10px;
+  width: 100%;
+  padding: 12px 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.22);
+  color:#fff;
+  font-weight: 700;
+}
+.install-btn:disabled{ opacity: 0.6; }
+
+/* Toggle switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+.switch input { display:none; }
+.slider {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(255,255,255,0.18);
+  transition: .2s;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px; width: 18px;
+  left: 3px; top: 2px;
+  background-color: white;
+  transition: .2s;
+  border-radius: 999px;
+}
+input:checked + .slider {
+  background-color: rgba(31,122,122,0.65);
+}
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+/* =======================
+   FLIP CARD IMPLEMENTATION (Android-safe)
+   ======================= */
+
+.card{
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.22);
+  position:relative;
+  cursor:pointer;
+
+  min-height: clamp(240px, 40dvh, 460px);
+  overflow: hidden;
+  padding: 0;
+
+  /* Important for mobile tap */
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.tap-hint{
+  position:absolute;
+  top:10px;
+  right:12px;
+  font-size: 11px;
+  color: var(--muted);
+  opacity: 0.9;
+  z-index: 5;
+  pointer-events: none; /* don’t block taps */
+}
+
+/* Flip container */
+.flip{
+  width: 100%;
+  height: 100%;
+  perspective: 1200px;
+  -webkit-perspective: 1200px; /* Android */
+}
+
+.flip-inner{
+  width: 100%;
+  height: 100%;
+  position: relative;
+
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d; /* Android */
+
+  transition: transform 420ms ease;
+  -webkit-transition: -webkit-transform 420ms ease;
+
+  border-radius: 16px;
+}
+
+.flip-inner.is-flipped{
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg); /* Android */
+}
+
+/* Faces */
+.flip-face{
+  position: absolute;
+  inset: 0;
+  padding: 18px;
+
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden; /* Android */
+
+  display: flex;
+  flex-direction: column;
+}
+
+.flip-front{
+  background: var(--panel);
+  color: var(--text);
+}
+
+.flip-back{
+  background: var(--panel);
+  color: var(--text);
+
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg); /* Android */
+}
+
+/* Bigger answer */
+.answer{
+  margin-top: 12px;
+  font-size: 20px;  /* increased */
+  line-height: 1.45;
+  color:#111827;
+  font-weight: 650;
+}
+
+/* Difficulty badge */
+.badge{
+  display:inline-block;
+  margin-top: 18px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid rgba(17,24,39,0.18);
+  background: rgba(17,24,39,0.06);
+  color: #111827;
+  width: fit-content;
+}
+
+.badge.basic{
+  background: rgba(46,139,87,0.12);
+  border-color: rgba(46,139,87,0.35);
+}
+.badge.intermediate{
+  background: rgba(240,173,78,0.18);
+  border-color: rgba(240,173,78,0.45);
+}
+.badge.advanced{
+  background: rgba(217,83,79,0.15);
+  border-color: rgba(217,83,79,0.45);
+}
+
+/* Text */
+.question{
+  margin-top: 12px;
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.answer{
+  margin-top: 12px;
+  font-size: 18px; /* bigger answer text */
+  line-height: 1.45;
+  color:#111827;
+  font-weight: 600;
+}
+
+/* Hints on faces */
+.front-hint, .back-hint{
+  margin-top: auto;
+  font-size: 12px;
+  color: var(--muted);
+  opacity: 0.9;
+  padding-top: 8px;
+}
+
+/* Small screens: stack buttons */
+@media (max-width: 420px){
+  .buttons{
+    flex-direction: column;
+  }
+  .buttons button{
+    width: 100%;
+  }
+  .answer{
+    font-size: 19px;
+  }
+}
